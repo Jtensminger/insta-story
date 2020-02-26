@@ -6,6 +6,9 @@ import logging
 import argparse
 import pprint
 import requests
+import pandas as pd
+import numpy as np
+import csv
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -110,9 +113,20 @@ if __name__ == '__main__':
     cookie_expiry = api.cookie_jar.auth_expires
     print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
-    account_que = ['1697296', '6867616399', '359090248', '10206720', '268071795', '4136433602', '434820235', '1911166915', '182528637', '26490008', '8663171404']
+    # open the tracking accounts CSV to get the accounts to download content from for today.
+    fields=['id']
+    tracking_accounts = pd.read_csv('tracking_accounts.csv')
+    #pp.pprint(tracking_accounts)
+    #pp.pprint(tracking_accounts['id'])
+    account_ids = tracking_accounts[tracking_accounts['id'].notnull()]['id'].astype('int64').astype('str')
+    pp.pprint(account_ids)
+
+    #account_que = ['169796', '6867616399', '359090248', '10206720', '268071795', '4136433602', '434820235', '1911166915', '182528637', '26490008', '8663171404']
+    #account_que = tracking_accounts['id']
+    account_que = account_ids
     for account in account_que:
         # Call the api
+
         results = api.user_reel_media(account)
 
         if str(results['latest_reel_media']) == 'None':
