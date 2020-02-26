@@ -9,6 +9,7 @@ import requests
 import pandas as pd
 import numpy as np
 import csv
+from csv import DictWriter
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -114,15 +115,17 @@ if __name__ == '__main__':
     print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
     # open the tracking accounts CSV to get the accounts to download content from for today.
-    fields=['id']
+
     tracking_accounts = pd.read_csv('tracking_accounts.csv')
-    #pp.pprint(tracking_accounts)
-    #pp.pprint(tracking_accounts['id'])
     account_ids = tracking_accounts[tracking_accounts['id'].notnull()]['id'].astype('int64').astype('str')
-    pp.pprint(account_ids)
+
 
     #account_que = ['169796', '6867616399', '359090248', '10206720', '268071795', '4136433602', '434820235', '1911166915', '182528637', '26490008', '8663171404']
     #account_que = tracking_accounts['id']
+
+    story_records = pd.read_csv('story_records.csv')
+    story_fieldnames = story_records.columns.astype(str)
+
     account_que = account_ids
     for account in account_que:
         # Call the api
@@ -351,8 +354,8 @@ if __name__ == '__main__':
 
 
             reel_mentions_blob = story['reel_mentions']
-            records.append({
-                'fields': {
+
+            record = {
                     'story_id': story['id'],
                     'owner_id': story['user']['id'],
                     'image_asset': [image_asset['url']],
@@ -391,4 +394,11 @@ if __name__ == '__main__':
                     'location_name': location_name,
                     'location_coordinates': location_coordinates,
                     'reel_mentions_blob': reel_mentions_blob
-                }})
+            }
+
+            records.append(record)
+
+
+            with open('story_records.csv', 'a+', newline='') as csvfile:
+                dict_writer = DictWriter(csvfile, fieldnames=story_fieldnames)
+                dict_writer.writerow(record)
