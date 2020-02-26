@@ -110,7 +110,6 @@ if __name__ == '__main__':
     cookie_expiry = api.cookie_jar.auth_expires
     print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
-    airtable_id = 'appBbhGoVwwockVVP'
     account_que = ['1697296', '6867616399', '359090248', '10206720', '268071795', '4136433602', '434820235', '1911166915', '182528637', '26490008', '8663171404']
     for account in account_que:
         # Call the api
