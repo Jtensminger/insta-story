@@ -379,36 +379,3 @@ if __name__ == '__main__':
                     'location_coordinates': location_coordinates,
                     'reel_mentions_blob': reel_mentions_blob
                 }})
-
-
-# api-endpoint
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-
-
-que = list(chunks(records, 10))
-pp.pprint(records)
-pp.pprint('it begins')
-for record_list in que:
-    pp.pprint(len(record_list))
-
-api_key = "keyiHeRvc2XH57s2N"
-API_ENDPOINT = 'https://api.airtable.com/v0/appBbhGoVwwockVVP/story_table?api_key=keyiHeRvc2XH57s2N'
-
-if len(records) == 1:
-    data = {
-        "records": records
-    }
-else:
-    data = {
-        records[0]
-    }
-
-
-# sending post request and saving response as response object
-r = requests.post(url = API_ENDPOINT, data = {"fields": {'story_id': '121123123'}})
-
-pastebin_url = r.text
-print("The pastebin URL is:%s"%pastebin_url)
