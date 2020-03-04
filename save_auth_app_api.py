@@ -2,6 +2,8 @@ import json
 import codecs
 import datetime
 import os.path
+from os.path import splitext, basename
+from urllib.parse import urlparse
 import logging
 import argparse
 import pprint
@@ -10,6 +12,8 @@ import pandas as pd
 import numpy as np
 import csv
 from csv import DictWriter
+import shutil
+
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -398,6 +402,22 @@ if __name__ == '__main__':
 
             records.append(record)
 
+            if story['type'] == 'video':
+                video_response = requests.get(video_asset['url'], stream=True)
+                disassembled = urlparse(video_asset['url'])
+                filename, file_ext = splitext(basename(disassembled.path))
+                local_file = open("media/" + filename + file_ext, 'wb')
+                video_response.raw.decode_content = True
+                shutil.copyfileobj(video_response.raw, local_file)
+                del video_response
+
+            image_response = requests.get(image_asset['url'], stream=True)
+            disassembled = urlparse(image_asset['url'])
+            filename, file_ext = splitext(basename(disassembled.path))
+            local_file = open("media/" + filename + file_ext, 'wb')
+            image_response.raw.decode_content = True
+            shutil.copyfileobj(image_response.raw, local_file)
+            del image_response
 
             with open('story_records.csv', 'a+', newline='') as csvfile:
                 dict_writer = DictWriter(csvfile, fieldnames=story_fieldnames)
