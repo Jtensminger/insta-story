@@ -14,6 +14,20 @@ import csv
 from csv import DictWriter
 import shutil
 
+from google.cloud import storage
+
+def upload_blob(bucket_name, source_file_name, destination_blob_filename):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_filename)
+
+    blob.upload_from_filename(source_file_name)
+    blob.make_public()
+    return blob.public_url
+
+
+
+
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -410,6 +424,8 @@ if __name__ == '__main__':
                 video_response.raw.decode_content = True
                 shutil.copyfileobj(video_response.raw, local_file)
                 del video_response
+                record['video_asset'] = upload_blob("insta-media", "media/" + filename + file_ext, filename + file_ext)
+
 
             image_response = requests.get(image_asset['url'], stream=True)
             disassembled = urlparse(image_asset['url'])
@@ -418,6 +434,7 @@ if __name__ == '__main__':
             image_response.raw.decode_content = True
             shutil.copyfileobj(image_response.raw, local_file)
             del image_response
+            record['image_asset'] = upload_blob("insta-media", "media/" + filename + file_ext, filename + file_ext)
 
             with open('story_records.csv', 'a+', newline='') as csvfile:
                 dict_writer = DictWriter(csvfile, fieldnames=story_fieldnames)
